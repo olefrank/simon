@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simon</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="simon.js"></script>
+</head>
+<body>
+
+<div id="simon"></div>
+
+<script>
+    // DOM Ready
+    document.addEventListener("DOMContentLoaded", function() {
+        var el = document.getElementById('simon');
+        Simon.createDom(el);
+    });
+</script>
+
+</body>
+</html>
