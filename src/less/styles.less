@@ -1,0 +1,47 @@
+@red: #FF0000;
+@green: #00FF00;
+@blue: #0000FF;
+@yellow: #FFFF00;
+
+@red-active: lighten(@red, 20%);
+@green-active: lighten(@green, 20%);
+@blue-active: lighten(@blue, 20%);
+@yellow-active: lighten(@yellow, 20%);
+
+.board {
+  width: 240px;
+  height: 240px;
+  overflow: hidden;
+}
+
+.colorbox {
+  width: 100px;
+  height: 100px;
+  float: left;
+  cursor: pointer;
+}
+
+.red {
+  background-color: @red;
+}
+.red-active, .red:active {
+  background-color: @red-active;
+}
+.green {
+  background-color: @green;
+}
+.green-active, .green:active {
+  background-color: @green-active;
+}
+.blue {
+  background-color: @blue;
+}
+.blue-active, .blue:active {
+  background-color: @blue-active;
+}
+.yellow {
+  background-color: @yellow;
+}
+.yellow-active, .yellow:active {
+  background-color: @yellow-active;
+}

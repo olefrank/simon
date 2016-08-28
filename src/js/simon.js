@@ -1,6 +1,6 @@
 "use strict";
 
-var Simon = (function() {
+var Simon = function () {
 
     // values & flags
     var started;
@@ -15,7 +15,7 @@ var Simon = (function() {
     var roundFld;
     var btnStart;
 
-    var createDom = function(el) {
+    var createDom = function createDom(el) {
         var frag = document.createDocumentFragment();
         colors = [];
 
@@ -60,7 +60,7 @@ var Simon = (function() {
         btnStart = document.createElement('button');
         btnStart.className = 'btnStart';
         btnStart.textContent = 'START';
-        btnStart.addEventListener('click', function() {
+        btnStart.addEventListener('click', function () {
             if (!started) {
                 _gameStart();
             }
@@ -73,7 +73,7 @@ var Simon = (function() {
         _disableBoard();
     };
 
-    var _initialize = function(numColors) {
+    var _initialize = function _initialize(numColors) {
         // set values
         started = false;
         clickedIndex = -1;
@@ -85,11 +85,11 @@ var Simon = (function() {
         var i;
         var length = numColors || 4;
         for (i = 0; i < length; i++) {
-            sequence.push( _getRandomColor() );
+            sequence.push(_getRandomColor());
         }
     };
 
-    var _showColor = function(color) {
+    var _showColor = function _showColor(color) {
         var el = document.getElementById(color);
         var classActive = color + '-active';
         var oldClassName = el.className;
@@ -98,17 +98,17 @@ var Simon = (function() {
         el.className = oldClassName + ' ' + classActive;
 
         // set old class
-        setTimeout(function() {
+        setTimeout(function () {
             el.className = oldClassName;
         }, 400);
     };
 
-    var _playSequence = function() {
+    var _playSequence = function _playSequence() {
         _disableBoard();
 
         var i = 0;
         var color;
-        var interval = setInterval(function() {
+        var interval = setInterval(function () {
             color = sequence[i];
             _showColor(color);
             _playSound(color);
@@ -121,7 +121,7 @@ var Simon = (function() {
         }, 600);
     };
 
-    var _gameStart = function() {
+    var _gameStart = function _gameStart() {
         if (!started) {
             btnStart.setAttribute('disabled', '');
             started = true;
@@ -130,12 +130,12 @@ var Simon = (function() {
         }
     };
 
-    var _gameOver = function() {
+    var _gameOver = function _gameOver() {
         _initialize();
         btnStart.removeAttribute('disabled');
     };
 
-    var colorClickHandler = function(e) {
+    var colorClickHandler = function colorClickHandler(e) {
         clickedIndex++;
 
         // determine clicked color
@@ -154,58 +154,57 @@ var Simon = (function() {
         }
         // next round
         else {
-            // add to sequence
-            sequence.push( _getRandomColor() );
+                // add to sequence
+                sequence.push(_getRandomColor());
 
-            // reset
-            clickedIndex = -1;
+                // reset
+                clickedIndex = -1;
 
-            // start over after delay
-            setTimeout(function() {
-                // update score
-                _setScore(score + 100);
+                // start over after delay
+                setTimeout(function () {
+                    // update score
+                    _setScore(score + 100);
 
-                // update rounc
-                _setRound(round + 1);
+                    // update rounc
+                    _setRound(round + 1);
 
-                _playSequence();
-            }, 1000);
-        }
+                    _playSequence();
+                }, 1000);
+            }
     };
 
-    var _setScore = function(val) {
+    var _setScore = function _setScore(val) {
         score = val;
         scoreFld.textContent = score;
     };
 
-    var _setRound = function(val) {
+    var _setRound = function _setRound(val) {
         round = val;
         roundFld.textContent = val;
     };
 
-    var _disableBoard = function() {
-        colors.forEach(function(color) {
+    var _disableBoard = function _disableBoard() {
+        colors.forEach(function (color) {
             color.removeEventListener('click', colorClickHandler);
             color.style.pointerEvents = 'none';
         });
     };
 
-    var _enableBoard = function() {
-        colors.forEach(function(color) {
+    var _enableBoard = function _enableBoard() {
+        colors.forEach(function (color) {
             color.addEventListener('click', colorClickHandler);
             color.style.pointerEvents = 'all';
         });
     };
 
-    var _getRandomColor = function() {
+    var _getRandomColor = function _getRandomColor() {
         var colors = ['red', 'green', 'blue', 'yellow'];
-        var rndIdx = Math.floor(Math.random() * ( (colors.length-1) + 1) );
+        var rndIdx = Math.floor(Math.random() * (colors.length - 1 + 1));
 
         return colors[rndIdx];
-
     };
 
-    var _playSound = function(color) {
+    var _playSound = function _playSound(color) {
         var filepath = 'audio/simon-' + color + '.mp3';
         var audio = new Audio();
         audio.src = filepath;
@@ -214,6 +213,4 @@ var Simon = (function() {
     };
 
     return { createDom: createDom };
-
-
-})();
+}();

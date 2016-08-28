@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Simon</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="simon.js"></script>
+    <!-- bower:css -->
+    <!-- endinject -->
+    <link rel="stylesheet" href="css/app.min.css">
 </head>
 <body>
 
 <div id="simon"></div>
 
+<script src="js/app.min.js"></script>
 <script>
     // DOM Ready
     document.addEventListener("DOMContentLoaded", function() {
@@ -17,6 +19,7 @@
         Simon.createDom(el);
     });
 </script>
-
+<!-- bower:js -->
+<!-- endinject -->
 </body>
 </html>
