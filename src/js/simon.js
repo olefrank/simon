@@ -2,6 +2,9 @@
 
 var Simon = function () {
 
+    var timeShowColor = 400;
+    var timeDelayColor = 600;
+
     // values & flags
     var started;
     var score;
@@ -15,7 +18,7 @@ var Simon = function () {
     var roundFld;
     var btnStart;
 
-    var createDom = function createDom(el) {
+    var createDom = function(el) {
         var frag = document.createDocumentFragment();
         colors = [];
 
@@ -70,10 +73,10 @@ var Simon = function () {
         el.appendChild(frag);
 
         // disable board
-        _disableBoard();
+        Simon.disableBoard(colors);
     };
 
-    var _initialize = function _initialize(numColors) {
+    var initialize = function(numColors) {
         // set values
         started = false;
         clickedIndex = -1;
@@ -85,11 +88,37 @@ var Simon = function () {
         var i;
         var length = numColors || 4;
         for (i = 0; i < length; i++) {
-            sequence.push(_getRandomColor());
+            sequence.push(getRandomColor());
         }
+
+        return sequence;
     };
 
-    var _showColor = function _showColor(color) {
+    var playSequence = function(sequence) {
+        Simon.disableBoard();
+
+        var i = 0;
+        var color;
+
+        color = sequence[i];
+        Simon.showColor(color);
+        Simon.playSound(color);
+
+        var interval = setInterval(function () {
+            if ( i >= sequence.length - 1 ) {
+                clearInterval(interval);
+                Simon.enableBoard();
+            }
+            else {
+                i++;
+                color = sequence[i];
+                Simon.showColor(color);
+                Simon.playSound(color);
+            }
+        }, timeDelayColor);
+    };
+
+    var showColor = function(color) {
         var el = document.getElementById(color);
         var classActive = color + '-active';
         var oldClassName = el.className;
@@ -100,49 +129,42 @@ var Simon = function () {
         // set old class
         setTimeout(function () {
             el.className = oldClassName;
-        }, 400);
+        }, timeShowColor);
     };
 
-    var _playSequence = function _playSequence() {
-        _disableBoard();
 
-        var i = 0;
-        var color;
-        var interval = setInterval(function () {
-            color = sequence[i];
-            _showColor(color);
-            _playSound(color);
-            i++;
+    var playSound = function(color) {
+        var filepath = 'audio/simon-' + color + '.mp3';
+        var audio = new Audio();
+        audio.src = filepath;
+        audio.controls = true;
+        audio.autoplay = true;
 
-            if (i === sequence.length) {
-                clearInterval(interval);
-                _enableBoard();
-            }
-        }, 600);
+        return audio;
     };
 
-    var _gameStart = function _gameStart() {
+    var _gameStart = function() {
         if (!started) {
             btnStart.setAttribute('disabled', '');
             started = true;
-            _initialize(1);
-            _playSequence();
+            Simon.initialize(1);
+            playSequence(sequence);
         }
     };
 
-    var _gameOver = function _gameOver() {
-        _initialize();
+    var _gameOver = function() {
+        initialize();
         btnStart.removeAttribute('disabled');
     };
 
-    var colorClickHandler = function colorClickHandler(e) {
+    var colorClickHandler = function(e) {
         clickedIndex++;
 
         // determine clicked color
         var clicked = e.target.id;
 
         // play sound
-        _playSound(clicked);
+        Simon.playSound(clicked);
 
         // same round
         if (clickedIndex < sequence.length - 1) {
@@ -155,7 +177,7 @@ var Simon = function () {
         // next round
         else {
                 // add to sequence
-                sequence.push(_getRandomColor());
+                sequence.push(getRandomColor());
 
                 // reset
                 clickedIndex = -1;
@@ -168,49 +190,60 @@ var Simon = function () {
                     // update rounc
                     _setRound(round + 1);
 
-                    _playSequence();
+                    Simon.playSequence(sequence);
                 }, 1000);
             }
     };
 
-    var _setScore = function _setScore(val) {
+    var _setScore = function(val) {
         score = val;
         scoreFld.textContent = score;
     };
 
-    var _setRound = function _setRound(val) {
+    var _setRound = function(val) {
         round = val;
         roundFld.textContent = val;
     };
 
-    var _disableBoard = function _disableBoard() {
-        colors.forEach(function (color) {
-            color.removeEventListener('click', colorClickHandler);
+    var disableBoard = function() {
+        [
+            document.getElementById('red'),
+            document.getElementById('green'),
+            document.getElementById('blue'),
+            document.getElementById('yellow')
+        ].forEach(function (color) {
+            color.removeEventListener('click', colorClickHandler, false);
             color.style.pointerEvents = 'none';
         });
     };
 
-    var _enableBoard = function _enableBoard() {
-        colors.forEach(function (color) {
-            color.addEventListener('click', colorClickHandler);
+    var enableBoard = function() {
+        [
+            document.getElementById('red'),
+            document.getElementById('green'),
+            document.getElementById('blue'),
+            document.getElementById('yellow')
+        ].forEach(function (color) {
+            color.addEventListener('click', colorClickHandler, false);
             color.style.pointerEvents = 'all';
         });
     };
 
-    var _getRandomColor = function _getRandomColor() {
+    var getRandomColor = function() {
         var colors = ['red', 'green', 'blue', 'yellow'];
         var rndIdx = Math.floor(Math.random() * (colors.length - 1 + 1));
 
         return colors[rndIdx];
     };
 
-    var _playSound = function _playSound(color) {
-        var filepath = 'audio/simon-' + color + '.mp3';
-        var audio = new Audio();
-        audio.src = filepath;
-        audio.controls = true;
-        audio.autoplay = true;
+    return {
+        initialize: initialize,
+        createDom: createDom,
+        getRandomColor: getRandomColor,
+        playSequence: playSequence,
+        enableBoard: enableBoard,
+        disableBoard: disableBoard,
+        showColor: showColor,
+        playSound: playSound
     };
-
-    return { createDom: createDom };
 }();

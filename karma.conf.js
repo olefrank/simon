@@ -10,16 +10,35 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
 
 
+        browserNoActivityTimeout: 60000,
+
+
         // list of files / patterns to load in the browser
         files: [
             // libs
-            // 'app/libs/example.js',
+            'bower_components/jquery/dist/jquery.js',
+
+            // less.js
+            // todo remove
+            //'node_modules/gulp-less/node_modules/less/dist/less.js',
+
+            // tiny color
+            'node_modules/tinycolor2/dist/tinycolor-min.js',
+
+            // jasmine jquery
+            'node_modules/jasmine-jquery/lib/jasmine-jquery.js',
+
+            // fixtures
+            'spec/javascripts/fixtures/*.html',
+
+            // less
+            'src/less/**/*.less',
 
             // scripts
             'src/js/**/*.js',
 
             // tests
-            'test/js/**/*.js'
+            'spec/javascripts/*.js'
         ],
 
 
@@ -30,8 +49,20 @@ module.exports = function(config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
+            'src/less/**/*.less': ['less'],
             'src/js/**/*.js': ['babel'],
-            'test/js/**/*.js': ['babel']
+            'spec/javascripts/*.js': ['babel']
+        },
+
+
+        lessPreprocessor: {
+            options: {
+                save: false
+            }
+            //, transformPath: function (path) {
+            //    console.log("PATH:  " + path);
+            //    return path.replace(/\.less$/, '.compiled.css')
+            //}
         },
 
 
@@ -81,6 +112,7 @@ module.exports = function(config) {
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,
+
 
         // Concurrency level
         // how many browser should be started simultanous

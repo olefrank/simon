@@ -12,7 +12,7 @@ var gulp           = require("gulp"),
     inject         = require("gulp-inject"),
     less           = require("gulp-less"),
     filter         = require("gulp-filter"),
-    glob           = require("glob"),
+    //glob           = require("glob"),
     browserSync    = require("browser-sync"),
     babel          = require('gulp-babel'),
     LessAutoPrefix = require('less-plugin-autoprefix'),
@@ -134,13 +134,13 @@ gulp.task('test', function (done) {
 
 gulp.task("tasks", ["bower", "html", "babel", "less", "images", "audio"]);
 
-gulp.task("build", ["test", "tasks"]);
+gulp.task("build", ["tasks", "test"]);
 
 gulp.task("dev", ["tasks", "tdd"]);
 
-gulp.task("default", ["dev", "browser-sync"], function(){
+gulp.task("default", ["tasks", "browser-sync"], function(){
     gulp.watch(config.paths.html.src, ["html", browserSync.reload]);
-    gulp.watch(config.paths.es6.src, ["babel", browserSync.reload]);
+    gulp.watch(config.paths.javascript.src, ["babel", browserSync.reload]);
     gulp.watch(config.paths.bower.src, ["bower", browserSync.reload]);
     gulp.watch(config.paths.images.src, ["images", browserSync.reload]);
     gulp.watch(config.paths.audio.src, ["audio", browserSync.reload]);
