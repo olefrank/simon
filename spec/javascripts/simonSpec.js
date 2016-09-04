@@ -1,26 +1,29 @@
-"use strict";
+import * as simon from '../../src/js/simon';
+import { config } from '../../simon.config';
+
+const red = tinycolor('red');
 
 describe('Simon', function() {
 
     it("should be defined", function() {
-        expect(Simon).toBeDefined();
+        expect(simon).toBeDefined();
     });
 
     describe('getRandomColor()', function() {
         it('should return random colors', function() {
 
-            // arrange!
+            // arrange
             var colorsArr = [];
             var numCols = 20;
             var i;
 
             // get some colors
             for (i = 0; i < numCols; i++) {
-                var color = Simon.getRandomColor();
+                var color = simon.getRandomColor();
                 colorsArr.push(color);
             }
 
-            // act!
+            // act
             // they should not all be the same!
             var random = false;
             var ref = colorsArr[0];
@@ -32,7 +35,7 @@ describe('Simon', function() {
                 }
             }
 
-            // assert!
+            // assert
             expect(random).toBeTruthy();
         })
     });
@@ -40,11 +43,9 @@ describe('Simon', function() {
     describe('playSequence()', function() {
         jasmine.getFixtures().fixturesPath = 'base/spec/javascripts/fixtures';
 
-        var sequence,
+        let sequence,
             audioOrig,
             audioMock,
-            colorMs = 400,
-            delayMs = 200,
             red, green, blue, yellow;
 
         beforeEach(function () {
@@ -55,13 +56,9 @@ describe('Simon', function() {
             // mock Audio (PhantomJS does not know this)
             audioOrig = window.Audio;
             audioMock = {};
-            window.Audio = function() { return audioMock; };
-
-            // mock Simon methods
-            //spyOn(Simon, 'enableBoard');
-            //spyOn(Simon, 'disableBoard');
-            //spyOn(Simon, 'showColor').and.callThrough();
-            //spyOn(Simon, 'playSequence').and.callThrough();
+            window.Audio = function () {
+                return audioMock;
+            };
 
             // setup colors
             red = tinycolor('red');
@@ -76,9 +73,9 @@ describe('Simon', function() {
             window.Audio = audioOrig;
         });
 
-        it('the first color should be red', function () {
+        it('first active color should be red', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // act
             var actual = $("#red").css('background-color');
@@ -88,31 +85,19 @@ describe('Simon', function() {
             expect(actual).toEqual(expected);
         });
 
-        it('when red lights up other colors should be dimmed', function () {
+        it('other colors should be dimmed when red is active', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
-            // act
-            var actualBlue = $("#blue").css('background-color');
-            var expectedBlue = blue.lighten(30).toRgbString();
-            expect( actualBlue ).toBe( expectedBlue );
-
-            var actualGreen = $("#green").css('background-color');
-            var expectedGreen = green.lighten(30).toRgbString();
-            expect(actualGreen).toBe(expectedGreen);
-
-            var actualYellow = $("#yellow").css('background-color');
-            var expectedYellow = yellow.lighten(30).toRgbString();
-            expect(actualYellow).toBe(expectedYellow);
+            testColorsExcept('red');
         });
 
-        it('the second color should be green', function () {
+        it('second active color should be green', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // skip first color
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
+            skipColors(1);
 
             // act
             var actual = $("#green").css('background-color');
@@ -124,35 +109,21 @@ describe('Simon', function() {
 
         it('when green lights up other colors should be dimmed', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // skip first color
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
+            skipColors(1);
 
             // act
-            var actualBlue = $("#blue").css('background-color');
-            var expectedBlue = blue.lighten(30).toRgbString();
-            expect( actualBlue ).toBe( expectedBlue );
-
-            var actualRed = $("#red").css('background-color');
-            var expectedRed = red.lighten(30).toRgbString();
-            expect(actualRed).toBe(expectedRed);
-
-            var actualYellow = $("#yellow").css('background-color');
-            var expectedYellow = yellow.lighten(30).toRgbString();
-            expect(actualYellow).toBe(expectedYellow);
+            testColorsExcept('green');
         });
 
         it('the third color should be blue', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // skip first 2 colors
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
+            skipColors(2);
 
             // act
             var actual = $("#blue").css('background-color');
@@ -164,40 +135,21 @@ describe('Simon', function() {
 
         it('when blue lights up other colors should be dimmed', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // skip first 2 colors
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-
+            skipColors(2);
 
             // act
-            var actualGreen = $("#green").css('background-color');
-            var expectedGreen = green.lighten(30).toRgbString();
-            expect(actualGreen).toBe(expectedGreen);
-
-            var actualRed = $("#red").css('background-color');
-            var expectedRed = red.lighten(30).toRgbString();
-            expect(actualRed).toBe(expectedRed);
-
-            var actualYellow = $("#yellow").css('background-color');
-            var expectedYellow = yellow.lighten(30).toRgbString();
-            expect(actualYellow).toBe(expectedYellow);
+            testColorsExcept('blue');
         });
 
         it('the fourth color should be yellow', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // skip first 3 colors
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
+            skipColors(3);
 
             // act
             var actual = $("#yellow").css('background-color');
@@ -209,32 +161,18 @@ describe('Simon', function() {
 
         it('when yellow lights up other colors should be dimmed', function () {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // skip first 3 colors
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
-            jasmine.clock().tick(colorMs);
-            jasmine.clock().tick(delayMs);
+            skipColors(3);
 
             // act
-            var actualBlue = $("#blue").css('background-color');
-            var expectedBlue = blue.lighten(30).toRgbString();
-            expect( actualBlue ).toBe( expectedBlue );
-
-            var actualGreen = $("#green").css('background-color');
-            var expectedGreen = green.lighten(30).toRgbString();
-            expect(actualGreen).toBe(expectedGreen);
-
-            var actualRed = $("#red").css('background-color');
-            var expectedRed = red.lighten(30).toRgbString();
-            expect(actualRed).toBe(expectedRed);
+            testColorsExcept('yellow');
         });
     });
 
     describe('enableBoard()', function() {
+        jasmine.getFixtures().fixturesPath = 'base/spec/javascripts/fixtures';
 
         var btnBlue,
             sequence,
@@ -263,7 +201,7 @@ describe('Simon', function() {
 
         it('when sequence plays board should be disabled', function() {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
 
             // assert
             var actual = btnBlue.style['pointer-events'];
@@ -273,7 +211,7 @@ describe('Simon', function() {
 
         it('when sequence stops board should be enabled', function() {
             // arrange
-            Simon.playSequence(sequence);
+            simon.playSequence(sequence);
             jasmine.clock().tick(1000);
 
             // assert
@@ -284,3 +222,46 @@ describe('Simon', function() {
 
     });
 });
+
+// test helpers
+const skipColors = (num) => {
+    for (let i = 0; i < num; i++) {
+        jasmine.clock().tick(400);
+        jasmine.clock().tick(200);
+    }
+};
+
+const testColorsExcept = (color) => {
+    let actual,
+        expected,
+        red, green, blue, yellow;
+
+    ['red', 'green', 'blue', 'yellow'].forEach((c) => {
+
+        if (c !== color) {
+            actual = $(`#${c}`).css('background-color');
+
+            switch(c) {
+                case 'red':
+                    red = tinycolor('red');
+                    expected = red.lighten(30).toRgbString();
+                    break;
+                case 'green':
+                    green = tinycolor('green');
+                    expected = green.lighten(30).toRgbString();
+                    break;
+                case 'blue':
+                    blue = tinycolor('blue');
+                    expected = blue.lighten(30).toRgbString();
+                    break;
+                case 'yellow':
+                    yellow = tinycolor('yellow');
+                    expected = yellow.lighten(30).toRgbString();
+                    break;
+            }
+
+            // assert
+            expect( actual ).toBe( expected );
+        }
+    });
+};

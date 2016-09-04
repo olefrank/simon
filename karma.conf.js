@@ -7,7 +7,7 @@ module.exports = function(config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine'],
+        frameworks: ['browserify', 'jasmine'],
 
 
         browserNoActivityTimeout: 60000,
@@ -17,10 +17,6 @@ module.exports = function(config) {
         files: [
             // libs
             'bower_components/jquery/dist/jquery.js',
-
-            // less.js
-            // todo remove
-            //'node_modules/gulp-less/node_modules/less/dist/less.js',
 
             // tiny color
             'node_modules/tinycolor2/dist/tinycolor-min.js',
@@ -35,7 +31,7 @@ module.exports = function(config) {
             'src/less/**/*.less',
 
             // scripts
-            'src/js/**/*.js',
+            'src/js/simon.js',
 
             // tests
             'spec/javascripts/*.js'
@@ -50,33 +46,23 @@ module.exports = function(config) {
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
             'src/less/**/*.less': ['less'],
-            'src/js/**/*.js': ['babel'],
-            'spec/javascripts/*.js': ['babel']
+            'src/js/**/*.js': ['browserify'],
+            'spec/javascripts/*.js': ['browserify']
+        },
+
+
+        browserify: {
+            configure: function browserify(bundle) {
+                bundle.once('prebundle', function prebundle() {
+                    bundle.transform( 'babelify', { presets: [ 'es2015' ] } );
+                });
+            }
         },
 
 
         lessPreprocessor: {
             options: {
                 save: false
-            }
-            //, transformPath: function (path) {
-            //    console.log("PATH:  " + path);
-            //    return path.replace(/\.less$/, '.compiled.css')
-            //}
-        },
-
-
-        // config babel preprocessors
-        babelPreprocessor: {
-            options: {
-                presets: ['es2015'],
-                sourceMap: 'inline'
-            },
-            filename: function (file) {
-                return file.originalPath.replace(/\.js$/, '.es5.js');
-            },
-            sourceFileName: function (file) {
-                return file.originalPath;
             }
         },
 

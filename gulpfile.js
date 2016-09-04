@@ -1,25 +1,30 @@
-var gulp           = require("gulp"),
-    path           = require('path'),
-    util           = require('gulp-util'),
-    minifyHTML     = require("gulp-minify-html"),
-    concat         = require("gulp-concat"),
-    uglify         = require("gulp-uglify"),
-    nano           = require("gulp-cssnano"),
-    uncss          = require("gulp-uncss"),
-    imagemin       = require("gulp-imagemin"),
-    sourcemaps     = require("gulp-sourcemaps"),
-    mainBowerFiles = require("main-bower-files"),
-    inject         = require("gulp-inject"),
-    less           = require("gulp-less"),
-    filter         = require("gulp-filter"),
-    //glob           = require("glob"),
-    browserSync    = require("browser-sync"),
-    babel          = require('gulp-babel'),
-    LessAutoPrefix = require('less-plugin-autoprefix'),
-    autoprefix     = new LessAutoPrefix({
+var gulp            = require("gulp"),
+    path            = require('path'),
+    util            = require('gulp-util'),
+    minifyHTML      = require("gulp-minify-html"),
+    concat          = require("gulp-concat"),
+    uglify          = require("gulp-uglify"),
+    nano            = require("gulp-cssnano"),
+    uncss           = require("gulp-uncss"),
+    imagemin        = require("gulp-imagemin"),
+    sourcemaps      = require("gulp-sourcemaps"),
+    mainBowerFiles  = require("main-bower-files"),
+    inject          = require("gulp-inject"),
+    less            = require("gulp-less"),
+    filter          = require("gulp-filter"),
+    browserSync     = require("browser-sync"),
+    babel           = require('gulp-babel'),
+    LessAutoPrefix  = require('less-plugin-autoprefix'),
+    autoprefix      = new LessAutoPrefix({
         browsers: ['last 2 versions']
     }),
-    KarmaServer    = require('karma').Server;
+    KarmaServer     = require('karma').Server;
+
+//const gulp          = require('gulp');
+const babelify      = require('babelify');
+const browserify    = require('browserify');
+const source        = require('vinyl-source-stream');
+const buffer        = require('vinyl-buffer');
 
 var config = {
     paths: {
@@ -63,6 +68,7 @@ gulp.task("html", function(){
         .pipe(gulp.dest(config.paths.html.dest));
 });
 
+// not used
 gulp.task('babel', function() {
     gulp.src(config.paths.javascript.src)
         .pipe(babel({
@@ -72,6 +78,17 @@ gulp.task('babel', function() {
         .pipe(uglify())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(config.paths.javascript.dest));
+});
+
+gulp.task('babelify', () => {
+    browserify('src/js/app.js', {debug: true})
+        .transform('babelify', {
+            presets: ['es2015']
+        })
+        .bundle()
+        .pipe(source('app.min.js'))
+        .pipe(buffer())
+        .pipe(gulp.dest(config.paths.javascript.dest))
 });
 
 gulp.task("images", function(){
@@ -132,7 +149,7 @@ gulp.task('test', function (done) {
     }).start();
 });
 
-gulp.task("tasks", ["bower", "html", "babel", "less", "images", "audio"]);
+gulp.task("tasks", ["bower", "html", "babelify", "less", "images", "audio"]);
 
 gulp.task("build", ["tasks", "test"]);
 
@@ -140,7 +157,7 @@ gulp.task("dev", ["tasks", "tdd"]);
 
 gulp.task("default", ["tasks", "browser-sync"], function(){
     gulp.watch(config.paths.html.src, ["html", browserSync.reload]);
-    gulp.watch(config.paths.javascript.src, ["babel", browserSync.reload]);
+    gulp.watch(config.paths.javascript.src, ["babelify", browserSync.reload]);
     gulp.watch(config.paths.bower.src, ["bower", browserSync.reload]);
     gulp.watch(config.paths.images.src, ["images", browserSync.reload]);
     gulp.watch(config.paths.audio.src, ["audio", browserSync.reload]);
